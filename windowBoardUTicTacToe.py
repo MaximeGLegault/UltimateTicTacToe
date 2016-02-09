@@ -12,7 +12,7 @@ class WindowBoard(Canvas):
         self.caseSize = caseSize
         self.caseRectangle = {}
 
-        #**************************
+        #TODO ************************** is it useful
         self.game = game
 
 
@@ -32,8 +32,10 @@ class WindowBoard(Canvas):
                 self.caseRectangle[iii, jjj] = self.create_rectangle(startColumn, startLine, endColumn, endLine,
                                                                      fill='#e1e1e1', width=2, outline='white',
                                                                      tags='Rect')
+
     def getCaseSize(self):
         return self.caseSize
 
     def getBoardNumber(self):
         return self.board.parentCoordinates
+

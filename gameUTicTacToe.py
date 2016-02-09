@@ -41,7 +41,8 @@ class Game:
         self.players.append(player)
 
     def setStarterPlayer(self):
-        assert len(self.players) >= 2
+        #TODO see if this still old
+        #assert len(self.players) >= 2
 
         if self.players[0].getToken() == "X":
             self.currentPlayer = self.players[0]

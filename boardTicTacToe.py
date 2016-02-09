@@ -18,7 +18,7 @@ class Board:
     """
 
 
-    def __init__(self, parentCoordinates, numberOfLine = 3, numberOfColumn = 3, writable=False):
+    def __init__(self, parentCoordinates, numberOfLine = 3, numberOfColumn = 3, writable=True):
         assert isinstance(parentCoordinates, tuple)
         assert isinstance(parentCoordinates[0], int)
         assert isinstance(parentCoordinates[1], int)

@@ -16,11 +16,15 @@ class Window(Tk):
         self.title("Ultimate Tic-Tac-Toe")
         self.resizable(width=False, height=False)
 
-        self.game = Game()
+        #change game opener
+        self.startNewDefaultGame()
+
+
+
         self.windowBoard = {}
         self.createWindowLayout()
         self.createWindowBoard()
-
+        self.showWritableBoards()
 
     def createWindowLayout(self):
         self.frm_button = Frame(self, padx=5, pady=5)
@@ -49,17 +53,24 @@ class Window(Tk):
     def createWindowBoard(self):
         for i in range(0, 3):
             for j in range(0, 3):
-                self.frame = Frame(self, borderwidth=5, relief=GROOVE)
-                self.frame.grid(row=i+2, column=j, pady=5)
-                self.windowBoard[i, j] = WindowBoard(self.frame, self.game.getBoard(i, j), self.game)
+                frame = Frame(self, borderwidth=5, relief=GROOVE)
+                frame.grid(row=i+2, column=j, pady=5)
+                self.windowBoard[i, j] = WindowBoard(frame, self.game.getBoard(i, j), self.game)
                 self.windowBoard[i, j].grid()
                 self.windowBoard[i, j].bind('<Button-1>', self.selectMove)
-        self.messages = Label(self)
-        self.messages.grid(columnspan=3)
+        """TODO check this
+        messages = Label(self)
+        messages.grid(columnspan=3)
+        """
 
     def newGame(self):
         self.game = StartNewGameWindow(self, self.game).show()
 
+    def startNewDefaultGame(self):
+        self.game = Game()
+        self.game.addPlayer(Player("John", "human", "X"))
+        self.game.addPlayer(Player("Ass", "human", "O"))
+        self.game.setStarterPlayer()
 
     def openGame(self):
         pass
@@ -71,7 +82,11 @@ class Window(Tk):
         pass
 
     def selectMove(self, event):
-
+        """
+        Function that process a click on the board.
+        :param event tkinter event that spawned the funtion calls:
+        :return:
+        """
         lineOfTheSelectedCase = event.y // event.widget.getCaseSize()
         columnOfTheSelectedCase = event.x // event.widget.getCaseSize()
         caseNumbers = (lineOfTheSelectedCase, columnOfTheSelectedCase)
@@ -86,24 +101,47 @@ class Window(Tk):
                                                                        event.widget.getBoardNumber()[1],
                                                                        lineOfTheSelectedCase, columnOfTheSelectedCase))
     def checkForValidBoard(self, boardNumbers):
+        """
+
+        :param boardNumbers:
+        :return (bool)True or False, the writable state of the board:
+        """
         return self.game.getWritableOfBoard(boardNumbers)
 
     def checkForValidCase(self, boardNumbers, caseNumbers):
+        """
+
+        :param boardNumbers:
+        :param caseNumbers:
+        :return (bool)True or False, the writable state of the case:
+        """
         return self.game.getWritableOfCase(boardNumbers, caseNumbers)
 
     def writeMove(self, boardNumbers, caseNumbers, event):
-        #TODO change this
-        if not self.checkForValidBoard(boardNumbers):
+        """
+
+        :param boardNumbers:
+        :param caseNumbers:
+        :param event:
+        :return:
+        """
+        if self.checkForValidBoard(boardNumbers):
             if self.checkForValidCase(boardNumbers, caseNumbers):
                 self.addToken(boardNumbers, caseNumbers, event)
                 return True
+        return False
 
     def addToken(self, boardNumbers, caseNumbers, event):
-        self.game.addPlayer(Player("John", "human", "X"))
-        self.game.addToken(boardNumbers, caseNumbers, self.game.players[0].token)
 
+        self.game.addToken(boardNumbers, caseNumbers, self.game.players[0].token)
         coordonnee_y = caseNumbers[0] * event.widget.getCaseSize() + event.widget.getCaseSize() // 2
         coordonnee_x = caseNumbers[1] * event.widget.getCaseSize() + event.widget.getCaseSize() // 2
         #TODO change this
         event.widget.create_text(coordonnee_x, coordonnee_y, text=self.game.players[0].token,
                                  font=('Helvetica', event.widget.getCaseSize()//2), tags='pion')
+
+    def showWritableBoards(self):
+        for i in range(0, 3):
+            for j in range(0, 3):
+                if self.game.getWritableOfBoard((i, j)) == True:
+                    self.windowBoard[i, j].itemconfig("Rect", fill='light green')
