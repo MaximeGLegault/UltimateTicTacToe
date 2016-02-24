@@ -107,3 +107,4 @@ class StartNewGameWindow():
     def on_closing(self):
         self.goAhead = True
         self.show()
+

@@ -28,5 +28,4 @@ class Case:
     def setToken(self, token):
         assert isinstance(token, str)
         assert token in [" ", "X", "O"]
-
         self.contained = token

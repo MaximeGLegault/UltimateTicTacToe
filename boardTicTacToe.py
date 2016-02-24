@@ -98,15 +98,23 @@ class Board:
         assert isinstance(token, str)
         assert token in [" ", "X", "O"]
 
-        test = (token, token, token)
-        return ((self.cases[0, 0].contenu,self.cases[0, 1].contenu,self.cases[0, 2].contenu) == test or
-                (self.cases[1, 0].contenu,self.cases[1, 1].contenu,self.cases[1, 2].contenu) == test or
-                (self.cases[2, 0].contenu,self.cases[2, 1].contenu,self.cases[2, 2].contenu) == test or
-                (self.cases[0, 0].contenu,self.cases[1, 0].contenu,self.cases[2, 0].contenu) == test or
-                (self.cases[0, 1].contenu,self.cases[1, 1].contenu,self.cases[2, 1].contenu) == test or
-                (self.cases[0, 2].contenu,self.cases[1, 2].contenu,self.cases[2, 2].contenu) == test or
-                (self.cases[0, 0].contenu,self.cases[1, 1].contenu,self.cases[2, 2].contenu) == test or
-                (self.cases[2, 0].contenu,self.cases[1, 1].contenu,self.cases[0, 2].contenu) == test)
+        test = (True, True, True)
+        return ((self.cases[0, 0].isToken(token), self.cases[0, 1].isToken(token),
+                 self.cases[0, 2].isToken(token)) == test or
+                (self.cases[1, 0].isToken(token), self.cases[1, 1].isToken(token),
+                 self.cases[1, 2].isToken(token)) == test or
+                (self.cases[2, 0].isToken(token), self.cases[2, 1].isToken(token),
+                 self.cases[2, 2].isToken(token)) == test or
+                (self.cases[0, 0].isToken(token), self.cases[1, 0].isToken(token),
+                 self.cases[2, 0].isToken(token)) == test or
+                (self.cases[0, 1].isToken(token), self.cases[1, 1].isToken(token),
+                 self.cases[2, 1].isToken(token)) == test or
+                (self.cases[0, 2].isToken(token), self.cases[1, 2].isToken(token),
+                 self.cases[2, 2].isToken(token)) == test or
+                (self.cases[0, 0].isToken(token), self.cases[1, 1].isToken(token),
+                 self.cases[2, 2].isToken(token)) == test or
+                (self.cases[2, 0].isToken(token), self.cases[1, 1].isToken(token),
+                 self.cases[0, 2].isToken(token)) == test)
 
 
 

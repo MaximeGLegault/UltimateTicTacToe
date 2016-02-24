@@ -12,6 +12,7 @@ from playerTicTacToe import Player
 class Window(Tk):
 
     def __init__(self):
+        #create the window
         super().__init__()
         self.title("Ultimate Tic-Tac-Toe")
         self.resizable(width=False, height=False)
@@ -19,14 +20,14 @@ class Window(Tk):
         #change game opener
         self.startNewDefaultGame()
 
-
-
+        #create the board of the game
         self.windowBoard = {}
         self.createWindowLayout()
         self.createWindowBoard()
-        self.showWritableBoards()
+        self.showShadowWritableBoards()
 
     def createWindowLayout(self):
+        #create the button
         self.frm_button = Frame(self, padx=5, pady=5)
         self.frm_button.grid(row=0, column=0, sticky=W, columnspan=2)
         self.btn_newgame = Button(self.frm_button, text="New Game", command=self.newGame)
@@ -38,16 +39,18 @@ class Window(Tk):
         self.btn_rules = Button(self.frm_button, text="Rules", command=self.rules)
         self.btn_rules.grid(row=0, column=3, sticky=W, padx=5)
 
-        self.frm_historique = Frame(self, padx=5, pady=5)
-        self.frm_historique.grid(row=2, column=4, rowspan=3)
+        #create the moves history
+        self.frm_history = Frame(self, padx=5, pady=5)
+        self.frm_history.grid(row=2, column=4, rowspan=3)
 
-        self.scr_historique = Scrollbar(self.frm_historique, orient=VERTICAL)
-        self.lst_historique = Listbox(self.frm_historique, height=25, width=25, yscrollcommand=self.scr_historique.set)
-        self.scr_historique.config(command=self.lst_historique.yview)
-        self.scr_historique.grid(row=1, column=1, sticky=N+S)
-        self.lst_historique.grid(row=1, column=0, sticky=N+S+E+W)
+        self.scr_history = Scrollbar(self.frm_history, orient=VERTICAL)
+        self.lst_history = Listbox(self.frm_history, height=25, width=25, yscrollcommand=self.scr_history.set)
+        self.scr_history.config(command=self.lst_history.yview)
+        self.scr_history.grid(row=1, column=1, sticky=N + S)
+        self.lst_history.grid(row=1, column=0, sticky=N + S + E + W)
 
-        self.messages = Label(self)
+        #Bottom message shower
+        self.messages = Label(self, text='Where am I?')
         self.messages.grid(columnspan=3)
 
     def createWindowBoard(self):
@@ -65,11 +68,12 @@ class Window(Tk):
 
     def newGame(self):
         self.game = StartNewGameWindow(self, self.game).show()
+        self.resetBoard()
 
     def startNewDefaultGame(self):
         self.game = Game()
-        self.game.addPlayer(Player("John", "human", "X"))
-        self.game.addPlayer(Player("Ass", "human", "O"))
+        self.game.addPlayer(Player("Human", "human", "X"))
+        self.game.addPlayer(Player("Computer", "human", "O"))
         self.game.setStarterPlayer()
 
     def openGame(self):
@@ -92,14 +96,53 @@ class Window(Tk):
         caseNumbers = (lineOfTheSelectedCase, columnOfTheSelectedCase)
         boardNumbers = event.widget.getBoardNumber()
 
+        """
         if self.writeMove(boardNumbers, caseNumbers, event):
-            print("ok")
+            if self.game.isWinning():
+                #TODO see what to do with those
+                self.messages.config(foreground='black', text='The player {} is the winner!'.format(self.game.currentPlayer))
+                #This thing between
+                self.removeShadowWritableBoards()
+                self.game.setWritableOfBoard(boardNumbers, False)
+            else:
+                self.removeShadowWritableBoards()
+                self.game.changeCurrentPlayer()
+                self.changeShadowWritableBoard(caseNumbers)
+                self.showShadowWritableBoards()
 
-
-        self.messages.config(foreground='black')
-        self.messages.config(text="Plateau: {} {}  Case: {} {}".format(event.widget.getBoardNumber()[0],
+                #TODO see what to do with those
+                self.messages.config(foreground='black')
+                self.messages.config(text="Plateau: {} {}  Case: {} {}".format(event.widget.getBoardNumber()[0],
                                                                        event.widget.getBoardNumber()[1],
                                                                        lineOfTheSelectedCase, columnOfTheSelectedCase))
+        """
+
+        try:
+            if self.writeMove(boardNumbers, caseNumbers, event):
+                if self.game.isWinning():
+                    #TODO see what to do with those
+                    self.messages.config(foreground='black', text='The player {} is the winner!'.format(self.game.currentPlayer))
+                    #This thing between
+                    self.removeShadowWritableBoards()
+                    self.game.setWritableOfBoard(boardNumbers, False)
+                    self.updateMovesHistory()
+                else:
+                    self.removeShadowWritableBoards()
+                    self.game.changeCurrentPlayer()
+                    self.changeShadowWritableBoard(caseNumbers)
+                    self.showShadowWritableBoards()
+                    self.updateMovesHistory()
+
+                    #TODO see what to do with those
+                    self.messages.config(foreground='black')
+                    self.messages.config(text="Plateau: {} {}  Case: {} {}".format(event.widget.getBoardNumber()[0],
+                                                                           event.widget.getBoardNumber()[1],
+                                                                           lineOfTheSelectedCase, columnOfTheSelectedCase))
+
+        except:
+            pass
+
+
     def checkForValidBoard(self, boardNumbers):
         """
 
@@ -133,15 +176,40 @@ class Window(Tk):
 
     def addToken(self, boardNumbers, caseNumbers, event):
 
-        self.game.addToken(boardNumbers, caseNumbers, self.game.players[0].token)
+        self.game.addToken(boardNumbers, caseNumbers, self.game.currentPlayer.token)
         coordonnee_y = caseNumbers[0] * event.widget.getCaseSize() + event.widget.getCaseSize() // 2
         coordonnee_x = caseNumbers[1] * event.widget.getCaseSize() + event.widget.getCaseSize() // 2
         #TODO change this
-        event.widget.create_text(coordonnee_x, coordonnee_y, text=self.game.players[0].token,
+        event.widget.create_text(coordonnee_x, coordonnee_y, text=self.game.currentPlayer.token,
                                  font=('Helvetica', event.widget.getCaseSize()//2), tags='pion')
 
-    def showWritableBoards(self):
+    def showShadowWritableBoards(self):
         for i in range(0, 3):
             for j in range(0, 3):
-                if self.game.getWritableOfBoard((i, j)) == True:
+                if self.game.getWritableOfBoard((i, j)):
                     self.windowBoard[i, j].itemconfig("Rect", fill='light green')
+
+    def removeShadowWritableBoards(self):
+        for i in range(0, 3):
+            for j in range(0, 3):
+                if self.game.getWritableOfBoard((i, j)):
+                    self.windowBoard[i, j].itemconfig("Rect", fill='#e1e1e1')
+
+    def changeShadowWritableBoard(self, caseNumbers):
+        self.game.changeWritableForNextMove(caseNumbers)
+
+    def resetBoard(self):
+        self.removeShadowWritableBoards()
+        self.windowBoard.clear()
+        self.createWindowBoard()
+        self.showShadowWritableBoards()
+
+    def updateMovesHistory(self):
+        lastMove = self.game.getLastMoveFromHistory()
+        if lastMove:
+            self.lst_history.insert(END, "{} Plateau: ({}, {}), Case: ({}, {})".format( lastMove[1],
+                                                                                    lastMove[0][0][0],
+                                                                                    lastMove[0][0][1],
+                                                                                    lastMove[0][1][0],
+                                                                                    lastMove[0][1][1]))
+
